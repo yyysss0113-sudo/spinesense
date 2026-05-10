@@ -817,11 +817,11 @@ export default function App() {
               </div>
               <div style={{ flex: 1, background: asymmetry === "감지" ? "#fdecea" : "#e0f4f7", borderRadius: 12, padding: "12px", textAlign: "center" }}>
                 <div style={{ fontSize: 10, color: "#64748b", marginBottom: 3 }}>자세 분석</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: asymmetry === "감지" ? "#E63946" : "#028090" }}>
-                  {asymmetry === "감지" ? "⚠" : "✓"}
+                <div style={{ fontSize: 20, fontWeight: 800, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090" }}>
+                  {report.includes("뚜렷한 비대칭") ? "⚠" : report.includes("경미한 비대칭") ? "⚡" : "✓"}
                 </div>
-                <div style={{ fontSize: 10, color: asymmetry === "감지" ? "#E63946" : "#028090", fontWeight: 700 }}>
-                  {asymmetry === "감지" ? "비대칭 감지" : "정상 범위"}
+                <div style={{ fontSize: 10, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090", fontWeight: 700 }}>
+                  {report.includes("뚜렷한 비대칭") ? "비대칭 감지" : report.includes("경미한 비대칭") ? "경미한 비대칭" : loading ? "분석 중..." : "정상 범위"}
                 </div>
               </div>
             </div>
