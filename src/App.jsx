@@ -143,6 +143,7 @@ async function callClaude(apiKey, profile, riskPct, photoSrc) {
       payload: {
         model: "claude-sonnet-4-6",
         max_tokens: 800,
+        temperature: 0,
         messages: [{ role: "user", content: messageContent }],
       },
     }),
