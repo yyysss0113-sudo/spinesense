@@ -139,7 +139,7 @@ async function callClaude(apiKey, profile, riskPct, photoSrc) {
     body: JSON.stringify({
       apiKey,
       payload: {
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6",
         max_tokens: 800,
         messages: [{ role: "user", content: messageContent }],
       },
