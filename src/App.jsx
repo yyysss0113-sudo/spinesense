@@ -861,7 +861,7 @@ export default function App() {
       {/* 푸터 */}
       <div style={{ textAlign: "center", marginTop: 24, fontSize: 10, color: "#94a3b8", lineHeight: 1.8 }}>
         SpineSense · 제8회 교육 공공데이터 AI 활용대회 출품작<br />
-        교육부 학생건강검사 표본조사 원시자료 (2019–2024) 활용<br />
+        교육부 학생건강검사 원시자료 7개년(2018~2025) 활용<br />
         <button onClick={() => { sessionStorage.removeItem("ss_apikey"); setKeySet(false); setApiKey(""); }}
           style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 10, textDecoration: "underline", marginTop: 4 }}>
           API 키 재설정
