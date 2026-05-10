@@ -833,7 +833,7 @@ export default function App() {
                   {report.includes("비대칭 의심") ? "⚠" : "✓"}
                 </div>
                 <div style={{ fontSize: 10, color: report.includes("비대칭 의심") ? "#E63946" : "#028090", fontWeight: 700 }}>
-                  {report.includes("뚜렷한 비대칭") ? "비대칭 감지" : report.includes("경미한 비대칭") ? "경미한 비대칭" : loading ? "분석 중..." : "정상 범위"}
+                  {report.includes("비대칭 의심") ? "비대칭 의심" : loading ? "분석 중..." : "정상 범위"}
                 </div>
               </div>
             </div>
