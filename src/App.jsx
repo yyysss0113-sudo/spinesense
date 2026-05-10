@@ -56,9 +56,9 @@ function getBmiCat(bmi) {
 const BMI_STANDARD = "BMI 기준: 대한비만학회 (2022) · 저체중 <18.5 / 정상 18.5~23 / 과체중 23~25 / 비만 ≥25";
 
 function getRiskLevel(pct) {
-  if (pct >= 4.0) return { label: t.highRisk, color: "#E63946", bg: "#fdecea", dot: "🔴", eng: "HIGH" };
-  if (pct >= 2.5) return { label: t.cautionRisk, color: "#d97706", bg: "#fff8ec", dot: "🟡", eng: "CAUTION" };
-  return            { label: t.lowRisk, color: "#028090", bg: "#e0f4f7", dot: "🟢", eng: "LOW" };
+  if (pct >= 4.0) return { label: "고위험", color: "#E63946", bg: "#fdecea", dot: "🔴", eng: "HIGH" };
+  if (pct >= 2.5) return { label: "주의", color: "#d97706", bg: "#fff8ec", dot: "🟡", eng: "CAUTION" };
+  return            { label: "낮음", color: "#028090", bg: "#e0f4f7", dot: "🟢", eng: "LOW" };
 }
 
 // ── 이미지 압축 (API 전송용) ──
@@ -200,7 +200,7 @@ function Gauge({ pct }) {
 
 // ── 단계 표시줄 ──
 function StepBar({ step, t }) {
-  const steps = t ? t.steps : ["정보 입력", "위험도 분석", "자세 체크", "AI 리포트"];
+  const steps = ["정보 입력", "위험도 분석", "자세 체크", "AI 리포트"];
   return (
     <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
       {steps.map((s, i) => (
@@ -236,12 +236,10 @@ export default function App() {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("ss_apikey") || "");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [keySet, setKeySet] = useState(() => !!sessionStorage.getItem("ss_apikey"));
-  const [lang, setLang] = useState("ko");
-  const t = lang === "ko" ? T.ko : T.en;
 
   const saveKey = () => {
     const k = apiKeyInput.trim();
-    if (!k.startsWith("sk-ant-")) return alert(t.alertKey);
+    if (!k.startsWith("sk-ant-")) return alert("올바른 Anthropic API 키를 입력해주세요 (sk-ant-... 형태)");
     sessionStorage.setItem("ss_apikey", k);
     setApiKey(k);
     setKeySet(true);
@@ -424,21 +422,10 @@ export default function App() {
   if (!keySet) {
     return (
       <div style={S.page}>
-        <div style={{ textAlign: "center", marginBottom: 28, position: "relative" }}>
-          {/* 언어 토글 */}
-          <div style={{ position: "absolute", right: 0, top: 0, display: "flex", gap: 4 }}>
-            {["ko","en"].map(l => (
-              <button key={l} onClick={() => setLang(l)} style={{
-                padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
-                background: lang === l ? "#0D2A4E" : "#e2e8f0",
-                color: lang === l ? "#fff" : "#64748b",
-                fontSize: 11, fontWeight: 700,
-              }}>{l === "ko" ? "한국어" : "English"}</button>
-            ))}
-          </div>
-          <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>{t.brand}</div>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>SPINESENSE</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0D2A4E", margin: "6px 0" }}>
-            {t.title1}<span style={{ color: "#E63946" }}>{t.title2}</span>{t.title3}
+            AI 척추측만증 <span style={{ color: "#E63946" }}>조기발견</span> 스크리너
           </h1>
         </div>
         <div style={S.card}>
@@ -489,29 +476,18 @@ export default function App() {
   return (
     <div style={S.page}>
       {/* 헤더 */}
-      <div style={{ textAlign: "center", marginBottom: 24, position: "relative" }}>
-        {/* 언어 토글 */}
-        <div style={{ position: "absolute", right: 0, top: 0, display: "flex", gap: 4 }}>
-          {["ko","en"].map(l => (
-            <button key={l} onClick={() => setLang(l)} style={{
-              padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
-              background: lang === l ? "#0D2A4E" : "#e2e8f0",
-              color: lang === l ? "#fff" : "#64748b",
-              fontSize: 11, fontWeight: 700,
-            }}>{l === "ko" ? "한국어" : "English"}</button>
-          ))}
-        </div>
-        <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>{t.brand}</div>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>SPINESENSE</div>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0D2A4E", margin: "4px 0" }}>
-          {t.title1}<span style={{ color: "#E63946" }}>{t.title2}</span>{t.title3}
+          AI 척추측만증 <span style={{ color: "#E63946" }}>조기발견</span> 스크리너
         </h1>
         <p style={{ color: "#94a3b8", fontSize: 11, margin: "4px 0 0" }}>
-          {t.subtitle}
+          전국 7개년 137,318명 실측 데이터 기반 · 교육용 선별 보조 도구 (의료기기 아님)
         </p>
       </div>
 
       <div style={S.card}>
-        <StepBar step={step} t={t} />
+        <StepBar step={step} />
 
         {/* ══ STEP 0: 정보 입력 ══ */}
         {step === 0 && (
@@ -538,9 +514,9 @@ export default function App() {
             {(form.level === "중" || form.level === "고") && (
               <div style={{ marginBottom: 18 }}>
                 <label style={S.label}>
-                  {t.exerciseLabel}
+                  운동 여부
                   <span style={{ fontSize: 10, color: "#94a3b8", fontWeight: 400, marginLeft: 6 }}>
-                    {t.exerciseNote}
+                    (하루 30분 이상, 주 3회 기준)
                   </span>
                 </label>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -857,7 +833,7 @@ export default function App() {
                   {report.includes("뚜렷한 비대칭") ? "⚠" : report.includes("경미한 비대칭") ? "⚡" : "✓"}
                 </div>
                 <div style={{ fontSize: 10, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090", fontWeight: 700 }}>
-                  {report.includes("뚜렷한 비대칭") ? t.asymClear : report.includes("경미한 비대칭") ? t.asymMild : loading ? t.analyzing : t.asymNormal}
+                  {report.includes("뚜렷한 비대칭") ? "비대칭 감지" : report.includes("경미한 비대칭") ? "경미한 비대칭" : loading ? "분석 중..." : "정상 범위"}
                 </div>
               </div>
             </div>
