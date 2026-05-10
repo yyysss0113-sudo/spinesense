@@ -96,19 +96,19 @@ async function callClaude(apiKey, profile, riskPct, photoSrc) {
 [사진 분석 기준 — 엄격히 적용하세요]
 이 사진은 Adams Forward Bend Test입니다. 뒤에서 촬영한 숙인 자세입니다.
 
-판정 기준 (안전을 위해 보수적으로 판정):
-- 뚜렷한 비대칭: 한쪽 등/흉부가 반대쪽보다 명확히 높거나 돌출된 경우 → 즉시 병원 방문 권고
-- 경미한 비대칭: 약간의 좌우 차이가 관찰되나 뚜렷하지 않은 경우 → 3개월 내 검진 권고  
-- 정상: 좌우가 거의 대칭인 경우
+판정 기준 (2단계만 사용):
+- 비대칭 의심: 등 좌우 높이가 눈에 띄게 다른 경우 → 병원 방문 권고
+- 정상: 좌우가 확실히 대칭인 경우
 
-중요: 불확실할 때는 반드시 "뚜렷한 비대칭"으로 판정하세요. 과소평가는 위험합니다.
+중요: 조금이라도 차이가 보이면 반드시 "비대칭 의심"으로 판정하세요.
+"정상"은 확실히 대칭일 때만 사용하세요.
 "척추측만증입니다"라는 진단 표현은 절대 사용하지 마세요.
 
 다음 형식으로 작성하세요:
 
 【자세 분석】
-· 관찰 내용: (사진에서 보이는 구체적인 좌우 차이 묘사)
-· 판정: 뚜렷한 비대칭 / 경미한 비대칭 / 정상 중 하나
+· 관찰 내용: (사진에서 보이는 좌우 차이 묘사)
+· 판정: 비대칭 의심 / 정상 중 하나
 
 【종합 판정】
 (한 문장 — 통계 위험도와 자세 분석을 종합한 행동 권고)
@@ -829,10 +829,10 @@ export default function App() {
               </div>
               <div style={{ flex: 1, background: asymmetry === "감지" ? "#fdecea" : "#e0f4f7", borderRadius: 12, padding: "12px", textAlign: "center" }}>
                 <div style={{ fontSize: 10, color: "#64748b", marginBottom: 3 }}>자세 분석</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090" }}>
-                  {report.includes("뚜렷한 비대칭") ? "⚠" : report.includes("경미한 비대칭") ? "⚡" : "✓"}
+                <div style={{ fontSize: 20, fontWeight: 800, color: report.includes("비대칭 의심") ? "#E63946" : "#028090" }}>
+                  {report.includes("비대칭 의심") ? "⚠" : "✓"}
                 </div>
-                <div style={{ fontSize: 10, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090", fontWeight: 700 }}>
+                <div style={{ fontSize: 10, color: report.includes("비대칭 의심") ? "#E63946" : "#028090", fontWeight: 700 }}>
                   {report.includes("뚜렷한 비대칭") ? "비대칭 감지" : report.includes("경미한 비대칭") ? "경미한 비대칭" : loading ? "분석 중..." : "정상 범위"}
                 </div>
               </div>
