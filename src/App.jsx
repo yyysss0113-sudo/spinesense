@@ -56,9 +56,9 @@ function getBmiCat(bmi) {
 const BMI_STANDARD = "BMI 기준: 대한비만학회 (2022) · 저체중 <18.5 / 정상 18.5~23 / 과체중 23~25 / 비만 ≥25";
 
 function getRiskLevel(pct) {
-  if (pct >= 4.0) return { label: "고위험", color: "#E63946", bg: "#fdecea", dot: "🔴", eng: "HIGH" };
-  if (pct >= 2.5) return { label: "주의",   color: "#d97706", bg: "#fff8ec", dot: "🟡", eng: "CAUTION" };
-  return            { label: "낮음",   color: "#028090", bg: "#e0f4f7", dot: "🟢", eng: "LOW" };
+  if (pct >= 4.0) return { label: t.highRisk, color: "#E63946", bg: "#fdecea", dot: "🔴", eng: "HIGH" };
+  if (pct >= 2.5) return { label: t.cautionRisk, color: "#d97706", bg: "#fff8ec", dot: "🟡", eng: "CAUTION" };
+  return            { label: t.lowRisk, color: "#028090", bg: "#e0f4f7", dot: "🟢", eng: "LOW" };
 }
 
 // ── 이미지 압축 (API 전송용) ──
@@ -199,8 +199,8 @@ function Gauge({ pct }) {
 }
 
 // ── 단계 표시줄 ──
-function StepBar({ step }) {
-  const steps = ["정보 입력", "위험도 분석", "자세 체크", "AI 리포트"];
+function StepBar({ step, t }) {
+  const steps = t ? t.steps : ["정보 입력", "위험도 분석", "자세 체크", "AI 리포트"];
   return (
     <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
       {steps.map((s, i) => (
@@ -236,10 +236,12 @@ export default function App() {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("ss_apikey") || "");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [keySet, setKeySet] = useState(() => !!sessionStorage.getItem("ss_apikey"));
+  const [lang, setLang] = useState("ko");
+  const t = lang === "ko" ? T.ko : T.en;
 
   const saveKey = () => {
     const k = apiKeyInput.trim();
-    if (!k.startsWith("sk-ant-")) return alert("올바른 Anthropic API 키를 입력해주세요 (sk-ant-... 형태)");
+    if (!k.startsWith("sk-ant-")) return alert(t.alertKey);
     sessionStorage.setItem("ss_apikey", k);
     setApiKey(k);
     setKeySet(true);
@@ -422,10 +424,21 @@ export default function App() {
   if (!keySet) {
     return (
       <div style={S.page}>
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>SPINESENSE</div>
+        <div style={{ textAlign: "center", marginBottom: 28, position: "relative" }}>
+          {/* 언어 토글 */}
+          <div style={{ position: "absolute", right: 0, top: 0, display: "flex", gap: 4 }}>
+            {["ko","en"].map(l => (
+              <button key={l} onClick={() => setLang(l)} style={{
+                padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
+                background: lang === l ? "#0D2A4E" : "#e2e8f0",
+                color: lang === l ? "#fff" : "#64748b",
+                fontSize: 11, fontWeight: 700,
+              }}>{l === "ko" ? "한국어" : "English"}</button>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>{t.brand}</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0D2A4E", margin: "6px 0" }}>
-            AI 척추측만증 <span style={{ color: "#E63946" }}>조기발견</span> 스크리너
+            {t.title1}<span style={{ color: "#E63946" }}>{t.title2}</span>{t.title3}
           </h1>
         </div>
         <div style={S.card}>
@@ -437,6 +450,17 @@ export default function App() {
               키는 이 브라우저 세션에만 저장되며 외부로 전송되지 않습니다.
             </p>
           </div>
+
+          {/* 면책 동의 */}
+          <div style={{ background: "#fff8ec", border: "1.5px solid #d97706", borderRadius: 12, padding: "14px 16px", marginBottom: 16, fontSize: 11, color: "#92400e", lineHeight: 1.8 }}>
+            <strong>📋 이용 전 안내</strong><br />
+            본 앱은 중고등학생이 개발한 <strong>교육용 선별 보조 도구</strong>입니다.<br />
+            · 의료기기가 아니며 의학적 진단을 대체할 수 없습니다<br />
+            · 국가 공공데이터(7개년 137,318명) 기반 통계 참고용입니다<br />
+            · 결과와 무관하게 정확한 진단은 전문의 진료가 필요합니다<br />
+            <strong>시작하면 위 내용에 동의한 것으로 간주합니다.</strong>
+          </div>
+
           <div style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px", marginBottom: 16, fontSize: 12, color: "#64748b", lineHeight: 1.7 }}>
             📌 <strong>API 키 발급 방법</strong><br />
             1. <a href="https://console.anthropic.com" target="_blank" rel="noreferrer" style={{ color: "#028090" }}>console.anthropic.com</a> 접속<br />
@@ -465,18 +489,29 @@ export default function App() {
   return (
     <div style={S.page}>
       {/* 헤더 */}
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>SPINESENSE</div>
+      <div style={{ textAlign: "center", marginBottom: 24, position: "relative" }}>
+        {/* 언어 토글 */}
+        <div style={{ position: "absolute", right: 0, top: 0, display: "flex", gap: 4 }}>
+          {["ko","en"].map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{
+              padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
+              background: lang === l ? "#0D2A4E" : "#e2e8f0",
+              color: lang === l ? "#fff" : "#64748b",
+              fontSize: 11, fontWeight: 700,
+            }}>{l === "ko" ? "한국어" : "English"}</button>
+          ))}
+        </div>
+        <div style={{ fontSize: 11, letterSpacing: 4, color: "#028090", fontWeight: 800 }}>{t.brand}</div>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0D2A4E", margin: "4px 0" }}>
-          AI 척추측만증 <span style={{ color: "#E63946" }}>조기발견</span> 스크리너
+          {t.title1}<span style={{ color: "#E63946" }}>{t.title2}</span>{t.title3}
         </h1>
         <p style={{ color: "#94a3b8", fontSize: 11, margin: "4px 0 0" }}>
-          전국 7개년 137,318명 실측 데이터 기반 · 의학적 선별 보조 도구
+          {t.subtitle}
         </p>
       </div>
 
       <div style={S.card}>
-        <StepBar step={step} />
+        <StepBar step={step} t={t} />
 
         {/* ══ STEP 0: 정보 입력 ══ */}
         {step === 0 && (
@@ -503,9 +538,9 @@ export default function App() {
             {(form.level === "중" || form.level === "고") && (
               <div style={{ marginBottom: 18 }}>
                 <label style={S.label}>
-                  운동 여부
+                  {t.exerciseLabel}
                   <span style={{ fontSize: 10, color: "#94a3b8", fontWeight: 400, marginLeft: 6 }}>
-                    (하루 30분 이상, 주 3회 기준)
+                    {t.exerciseNote}
                   </span>
                 </label>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -822,7 +857,7 @@ export default function App() {
                   {report.includes("뚜렷한 비대칭") ? "⚠" : report.includes("경미한 비대칭") ? "⚡" : "✓"}
                 </div>
                 <div style={{ fontSize: 10, color: report.includes("뚜렷한 비대칭") ? "#E63946" : report.includes("경미한 비대칭") ? "#d97706" : "#028090", fontWeight: 700 }}>
-                  {report.includes("뚜렷한 비대칭") ? "비대칭 감지" : report.includes("경미한 비대칭") ? "경미한 비대칭" : loading ? "분석 중..." : "정상 범위"}
+                  {report.includes("뚜렷한 비대칭") ? t.asymClear : report.includes("경미한 비대칭") ? t.asymMild : loading ? t.analyzing : t.asymNormal}
                 </div>
               </div>
             </div>
