@@ -236,6 +236,8 @@ export default function App() {
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("ss_apikey") || "");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [keySet, setKeySet] = useState(() => !!sessionStorage.getItem("ss_apikey"));
+  const [lang, setLang] = useState("ko");
+  const t = lang === "ko" ? T.ko : T.en;
 
   const saveKey = () => {
     const k = apiKeyInput.trim();
@@ -509,7 +511,7 @@ export default function App() {
       </div>
 
       <div style={S.card}>
-        <StepBar step={step} />
+        <StepBar step={step} t={t} />
 
         {/* ══ STEP 0: 정보 입력 ══ */}
         {step === 0 && (
