@@ -730,7 +730,7 @@ export default function App() {
               {/* 숨긴 캔버스 (스냅샷용) */}
               <canvas ref={canvasRef} style={{ display: "none" }} />
               {/* 숨긴 파일 입력 */}
-              <input ref={fileInputRef} type="file" accept="image/*" capture="environment"
+              <input ref={fileInputRef} type="file" accept="image/*" 
                 style={{ display: "none" }} onChange={handleFileUpload} />
 
               {/* 촬영 전 */}
