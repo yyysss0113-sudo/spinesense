@@ -9,8 +9,9 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
   try {
-    const { apiKey, payload } = req.body;
-    const bodyStr = JSON.stringify(payload);
+    const { payload } = req.body;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    
 
     const result = await new Promise((resolve, reject) => {
       const request = https.request({
