@@ -159,7 +159,7 @@ const T = {
     s3Disclaimer: "⚠️ 이 결과는 의학적 진단이 아닌 선별 보조 정보입니다. 정확한 진단은 반드시 전문의 진료와 X-ray 검사를 통해 확인하세요.",
     restartBtn: "🔄 처음부터 다시 검사하기",
     reportError: (msg) => `리포트 생성 중 오류가 발생했습니다.\n\n${msg}\n\n네트워크 상태를 점검해주세요.`,
-    footer1: "SpineSense · 제8회 교육 공공데이터 AI 활용대회 출품작",
+    footer1: "SpineSense · 제8회 교육 공공데이터 AI 활용대회 수상작",
     footer2: "교육부 학생건강검사 원시자료 7개년(2018~2025) 활용",
     levelName: { "초": "초등학교", "중": "중학교", "고": "고등학교" },
     genderName: { "여": "여", "남": "남" },
@@ -261,6 +261,7 @@ async function callClaude(profile, riskPct, checkedLabels, lang) {
 이 판정은 사진 분석이 아니라 학생이 거울 앞에서 스스로 응답한 체크리스트 결과이니, 그대로 사용하세요(직접 재판정하지 마세요).
 "척추측만증입니다"라는 진단 표현은 절대 사용하지 마세요.
 "2주 내", "즉시" 등 구체적 시기 표현은 사용하지 마세요. 대신 "정형외과를 방문해 척추 검사를 받아보시길 권장합니다"로 통일하세요.
+마크다운 기호(#, *, -, --- 등)를 절대 사용하지 말고 일반 텍스트로만 작성하세요. 아래 형식 외에 제목이나 구분선을 추가하지 마세요.
 다음 형식으로 작성하세요:
 
 【자세 분석】
@@ -302,6 +303,7 @@ async function callClaude(profile, riskPct, checkedLabels, lang) {
 This determination comes from the student's own checklist responses in front of a mirror, not photo analysis — use it as given (do not re-judge it).
 Never use diagnostic phrasing such as "You have scoliosis."
 Never give specific timeframes such as "within 2 weeks" or "immediately." Instead, consistently say "We recommend visiting an orthopedic doctor for a spine examination."
+Write in plain text only — never use markdown symbols (#, *, -, ---). Do not add any titles or dividers beyond the format below.
 Write in exactly this format:
 
 【Posture Analysis】
@@ -342,7 +344,14 @@ This result is screening support information, not a medical diagnosis. An accura
   }
 
   const data = await res.json();
-  return data.content?.[0]?.text || (en ? "Failed to generate the report." : "리포트 생성에 실패했습니다.");
+  const raw = data.content?.[0]?.text || (en ? "Failed to generate the report." : "리포트 생성에 실패했습니다.");
+  // 모델이 마크다운을 섞어 쓰는 경우 대비: 표시용 기호 제거
+  return raw
+    .replace(/^#{1,4}\s*/gm, "")
+    .replace(/\*\*/g, "")
+    .replace(/^\s*---+\s*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function Gauge({ pct, natLabel }) {
