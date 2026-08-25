@@ -36,5 +36,5 @@ spinesense/
 ## 기술 스택
 - React 18 + Vite
 - Claude API (claude-sonnet-4-20250514)
-- 5개년 158,245명 실측 위험도 룩업 테이블
-- MediaPipe Pose (전문 버전 확장 예정)
+- 7개년 224,630명 검진 데이터 · 논문(epiH 2026) 회귀모델 기반 위험도 계산
+- 5문항 자가 체크리스트 (Adam's Forward Bend Test 원리)

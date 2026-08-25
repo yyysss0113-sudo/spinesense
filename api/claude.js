@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   try {
     const { payload } = req.body;
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    
+    const bodyStr = JSON.stringify(payload);
 
     const result = await new Promise((resolve, reject) => {
       const request = https.request({
