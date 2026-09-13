@@ -145,14 +145,15 @@ const T = {
     barMine: "나의 위험도", barNat: "전국 평균",
     barGroup: (lv, gd) => `${lv}교 ${gd} 평균`,
     interp: (n) => <>나와 같은 조건의 학생 <strong style={{ color: "#0D2A4E" }}>100명 중 {n}명</strong>이 척추측만증 진단을 받았습니다.</>,
-    nextPosture: "다음: 자세 분석 →", backHome: "← 처음으로",
+    nextPosture: "다음: 자세 자가 체크 →", backHome: "← 처음으로",
     s2Title: "🧍 자세 자가 체크",
     s2Sub: "카메라 없이, 거울 앞에서 아래 5문항만 체크해보세요",
     s2Srs: <><strong>⚠ SRS(척추측만연구학회) 공인 표준 선별검사</strong>인 Adam's Forward Bend Test 원리를 적용한 자가 체크 문항입니다. 해당하는 항목을 모두 선택해주세요.</>,
     s2Rule: "하나라도 해당되면 '비대칭 의심'으로 판정되어 병원 방문을 권장하는 리포트를 받게 됩니다. 모두 해당 없음이면 '정상 범위'로 판정됩니다.",
     s2Btn: "결과 확인하기 →",
+    noneOption: "모두 확인했지만 해당 사항 없음",
     s3Title: "🤖 AI 맞춤 리포트",
-    s3Sub: "통계 위험도 + 자세 분석 결과 종합",
+    s3Sub: "통계 위험도 + 자가 체크 결과 종합",
     s3Stat: "통계 위험도", s3Check: "자가 체크 결과",
     asymYes: "비대칭 의심", asymNo: "정상 범위",
     loading: "AI가 맞춤 리포트를 생성하고 있습니다...",
@@ -222,6 +223,7 @@ const T = {
     s2Srs: <><strong>⚠ Based on Adam's Forward Bend Test</strong>, the standard screening method endorsed by the Scoliosis Research Society (SRS). Select every item that applies to you.</>,
     s2Rule: "If any item applies, the result is 'possible asymmetry' and your report will recommend seeing a doctor. If none apply, the result is 'within normal range'.",
     s2Btn: "See My Results →",
+    noneOption: "I checked — none of these apply",
     s3Title: "🤖 AI Personalized Report",
     s3Sub: "Combining your statistical risk and posture self-check",
     s3Stat: "Statistical risk", s3Check: "Self-check result",
@@ -262,9 +264,10 @@ async function callClaude(profile, riskPct, checkedLabels, lang) {
 "척추측만증입니다"라는 진단 표현은 절대 사용하지 마세요.
 "2주 내", "즉시" 등 구체적 시기 표현은 사용하지 마세요. 대신 "정형외과를 방문해 척추 검사를 받아보시길 권장합니다"로 통일하세요.
 마크다운 기호(#, *, -, --- 등)를 절대 사용하지 말고 일반 텍스트로만 작성하세요. 아래 형식 외에 제목이나 구분선을 추가하지 마세요.
+각 항목은 간결하게 쓰고, 반드시 완결된 문장으로 리포트를 끝맺으세요.
 다음 형식으로 작성하세요:
 
-【자세 분석】
+【자가 체크 결과】
 · 관찰 내용: (자가 체크 응답 요약)
 · 판정: 비대칭 의심 / 정상 중 하나 (위에서 준 판정 그대로)
 
@@ -304,9 +307,10 @@ This determination comes from the student's own checklist responses in front of 
 Never use diagnostic phrasing such as "You have scoliosis."
 Never give specific timeframes such as "within 2 weeks" or "immediately." Instead, consistently say "We recommend visiting an orthopedic doctor for a spine examination."
 Write in plain text only — never use markdown symbols (#, *, -, ---). Do not add any titles or dividers beyond the format below.
+Keep each item concise and always finish the report with complete sentences.
 Write in exactly this format:
 
-【Posture Analysis】
+【Self-Check Results】
 · Observations: (summary of self-check responses)
 · Determination: Possible asymmetry / Normal (exactly as given above)
 
@@ -331,7 +335,7 @@ This result is screening support information, not a medical diagnosis. An accura
     body: JSON.stringify({
       payload: {
         model: "claude-sonnet-4-6",
-        max_tokens: 800,
+        max_tokens: 1500,
         temperature: 0,
         messages: [{ role: "user", content: en ? enPrompt : koPrompt }],
       },
@@ -434,11 +438,21 @@ export default function App() {
   const [checks, setChecks] = useState(() =>
     Object.fromEntries(SELF_CHECK_ITEMS.map((item) => [item.key, false]))
   );
+  const [noneChecked, setNoneChecked] = useState(false);
 
   const t = T[lang];
 
   const toggleCheck = useCallback((key) => {
     setChecks((c) => ({ ...c, [key]: !c[key] }));
+    setNoneChecked(false);
+  }, []);
+
+  const toggleNone = useCallback(() => {
+    setNoneChecked((v) => {
+      const next = !v;
+      if (next) setChecks(Object.fromEntries(SELF_CHECK_ITEMS.map((item) => [item.key, false])));
+      return next;
+    });
   }, []);
 
   const submit = () => {
@@ -465,6 +479,7 @@ export default function App() {
   };
 
   const submitSelfCheck = async () => {
+    if (!Object.values(checks).some(Boolean) && !noneChecked) return;
     const checkedLabels = SELF_CHECK_ITEMS.filter((item) => checks[item.key]).map((item) => lang === "en" ? item.en : item.ko);
     const detected = checkedLabels.length > 0;
     setAsymmetryDetected(detected);
@@ -483,6 +498,7 @@ export default function App() {
     setStep(0); setProfile(null); setReport("");
     setAsymmetryDetected(false);
     setChecks(Object.fromEntries(SELF_CHECK_ITEMS.map((item) => [item.key, false])));
+    setNoneChecked(false);
   };
 
   const lv = profile ? getRiskLevel(profile.riskPct, lang) : null;
@@ -848,11 +864,35 @@ export default function App() {
               ))}
             </div>
 
+            <div style={{ marginTop: -10, marginBottom: 18 }}>
+              <button
+                onClick={toggleNone}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, width: "100%",
+                  textAlign: "left", padding: "12px 14px",
+                  borderRadius: 12, cursor: "pointer",
+                  border: `2px solid ${noneChecked ? "#028090" : "#e2e8f0"}`,
+                  background: noneChecked ? "#e0f4f7" : "#fff",
+                }}
+              >
+                <div style={{
+                  width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                  border: `2px solid ${noneChecked ? "#028090" : "#cbd5e1"}`,
+                  background: noneChecked ? "#028090" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, color: "#fff", fontWeight: 700,
+                }}>
+                  {noneChecked ? "✓" : ""}
+                </div>
+                <div style={{ fontSize: 13, color: "#1e293b", fontWeight: 600 }}>{t.noneOption}</div>
+              </button>
+            </div>
+
             <div style={{ background: "#f8fafc", borderRadius: 10, padding: "10px 14px", fontSize: 11, color: "#64748b", lineHeight: 1.6, marginBottom: 16 }}>
               {t.s2Rule}
             </div>
 
-            <button onClick={submitSelfCheck} style={S.btn(true)}>{t.s2Btn}</button>
+            <button onClick={submitSelfCheck} disabled={!Object.values(checks).some(Boolean) && !noneChecked} style={S.btn(Object.values(checks).some(Boolean) || noneChecked)}>{t.s2Btn}</button>
           </div>
         )}
 
