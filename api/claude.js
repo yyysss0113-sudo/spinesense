@@ -1,3 +1,4 @@
+
 const https = require("https");
 
 export default async function handler(req, res) {
@@ -25,6 +26,7 @@ export default async function handler(req, res) {
           "anthropic-version": "2023-06-01",
         },
       }, (response) => {
+        response.setEncoding("utf8");
         let data = "";
         response.on("data", chunk => data += chunk);
         response.on("end", () => resolve({ status: response.statusCode, body: data }));
